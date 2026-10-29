@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Department-Level Software Hackathon: register your team</title>
-<meta name="description" content="A six-hour department-level software hackathon for ECS students only. Teams of two to three.">
+<meta name="description" content="A six-hour department-level software hackathon for ECS students only.">
 <meta name="theme-color" content="#16191d">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600&family=IBM+Plex+Sans:wght@600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -10,9 +10,9 @@
 <header class="nav"><a href="#top" class="mark" data-name>Hackathon</a><a href="#register" class="pill">Register</a></header>
 <main id="top">
 <section class="hero" data-shape="0"><p class="kicker"><span class="department-name">Department of Electronics and Computer Engineering</span><br><span class="kicker-sub">in association with<br><strong>O-TEC</strong> presents</span></p><h1>3×3×6</h1>
-<p class="lead">A department-level software hackathon for ECS students only. Teams of two to three.</p>
+<p class="lead">A department-level software hackathon for ECS students only.</p>
 <a href="#register" class="btn">Register your team</a><p class="hint">Scroll</p></section>
-<section data-shape="1"><h2>Teams of <i>2–3</i></h2>
+<section data-shape="1"><h2>The event</h2>
 <dl class="facts"><div><dt>Format</dt><dd>Six-hour software hackathon</dd></div><div><dt>Who</dt><dd>ECS students only</dd></div><div><dt>Date</dt><dd data-f="date"></dd></div><div><dt>Venue</dt><dd data-f="venue"></dd></div><div><dt>Challenge</dt><dd>3 Batches , 3 Different problem statements</dd></div><div><dt>Entry fee</dt><dd>₹50 per team</dd></div></dl></section>
 <section class="event-flow" data-shape="2"><h2>Event Flow</h2>
 <ol class="steps"><li>Registration &amp; Team Verification</li><li>Inauguration &amp; Introduction</li><li>Problem Statement Explanation</li><li>Brainstorming &amp; PPT Preparation</li><li>Idea Presentation &amp; Evaluation</li><li>Software Development &amp; Prototype Building</li><li>Progress Review</li><li>Final Demo &amp; Judging</li><li>Results &amp; Prize Distribution</li><li>Vote of Thanks &amp; Closing Ceremony</li></ol></section>
@@ -23,7 +23,7 @@
 <label class="f">Team name<input name="teamName" autocomplete="off" maxlength="60" required></label>
 <fieldset class="f"><legend>Team size</legend><div class="seg"><label><input type="radio" name="teamSize" value="2">2</label><label><input type="radio" name="teamSize" value="3">3</label></div><p class="err" data-e="teamSize"></p></fieldset>
 <div id="members"></div>
-<label class="f">Team members name (separated by comma)<input name="teamMembers" autocomplete="off" maxlength="244" placeholder="Name 1, Name 2, Name 3" required></label><p class="err" data-e="teamMembers"></p>
+<label class="f">Team members’ names (separated by commas)<input name="teamMembers" autocomplete="off" maxlength="244" placeholder="Teammate 1, Teammate 2" required></label><p class="err" data-e="teamMembers"></p>
 <label class="f">Team lead phone<input name="leadPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" required></label>
 <div class="payment">
 <h3>Entry fee: ₹50 per team</h3>
@@ -34,5 +34,6 @@
 <label class="f">Payment UTR ID<input name="utrId" autocomplete="off" maxlength="50" required></label><p class="err" data-e="utrId"></p>
 <label class="f hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
 <div class="f"><label class="chk"><input type="checkbox" name="consent"><span>You may contact me about this event.</span></label><p class="err" data-e="consent"></p></div>
+<p class="prize-tease"><span>₹X,XXX</span> is waiting for you</p>
 <button class="btn" id="go" type="submit"><span>Submit registration</span></button></form></section></main>
 <footer><p data-name></p><p data-f="department"></p><p id="contact"></p></footer></body></html>

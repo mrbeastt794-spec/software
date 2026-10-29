@@ -1,32 +1,30 @@
-# Department-Level Software Hackathon: registration site
+# Department Software Hackathon: registration site
 
-Mobile-first, scroll-led 3D site (Vite + three.js) with a serverless-style registration API that appends each registration to a Google Sheet. Each of the three batches receives a different problem statement at the venue on event day; the statements are not published on the site.
+Mobile-first, scroll-led 3D site (Vite + three.js). Registrations are saved to **Supabase** (Postgres) by server-side functions, and organizers view and download them on a password-protected admin page. Each of the three batches receives a different problem statement at the venue on event day; the statements are not published on the site.
+
+## 1. Set up Supabase
+1. Create a project at supabase.com.
+2. SQL Editor > New query > paste `supabase/schema.sql` > Run. This creates the `registrations` table and locks it (RLS on, no public access).
+3. Project Settings > API: copy the **Project URL** and the **service_role** key. The service_role key is secret: use it only in server env vars, never in client code, and never commit it.
+
+## 2. Environment variables
+`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD` (8+ characters), `ADMIN_SESSION_SECRET` (any long random string). Locally: copy `.env.example` to `.env`. On Vercel: Project Settings > Environment Variables (then redeploy).
+
+## 3. Deploy on Vercel
+Import the repo (Vite is auto-detected; output `dist`). `api/register.js` and `api/admin.js` become serverless functions, and `vercel.json` routes `/api/admin/*`. After deploying, open `https://your-site.vercel.app/admin.html`.
+
+## Admin page
+Sign in with `ADMIN_PASSWORD` to search registrations, filter by team lead year, and **Download CSV** (opens in Excel or Google Sheets; the year filter applies to the download). Sessions last 8 hours (HttpOnly cookie); repeated wrong passwords are blocked for 10 minutes (best-effort per server instance). You can also view or export the table directly in the Supabase dashboard (Table Editor).
 
 ## Run locally
 ```
 npm install
-cp .env.example .env     # fill in the values (see below)
-npm run dev              # site + /api/register at http://localhost:5173
+cp .env.example .env     # fill in the values
+npm run dev              # site + API at http://localhost:5173, admin at /admin.html
 npm run build && npm start   # production build at http://localhost:3000
-npm test                 # logic tests (fake Sheets API, not a real write)
+npm test                 # logic tests (fake Supabase client)
 ```
-Without `.env`, submitting shows an error and nothing is saved. Success appears only after the row is confirmed in the sheet.
+Success is shown to a student only after the row is read back from Supabase. A retry with the same submission key returns the original ID instead of a duplicate.
 
 ## Update event details
-Edit the marked block at the top of `shared/config.js`: date, venue, department, contact, year-group options. Fields left as "To be announced" are not invented.
-
-## Connect Google Sheets
-1. Google Cloud Console: create a project, enable the **Google Sheets API**.
-2. IAM > Service Accounts: create one, then Keys > Add key > JSON. Keep the file private; never commit it.
-3. Create the Google Sheet, rename a tab to `Registrations`, and **Share** the sheet with the service account's `client_email` as **Editor**. Keep it private otherwise.
-4. Set env vars: `GOOGLE_SHEET_ID` (from the sheet URL), `GOOGLE_SHEET_TAB`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY` (the JSON `private_key`, quoted, `\n` kept).
-5. `npm run check:sheet` writes one test row for real and reports the ID. Delete that row after.
-
-The header row is created automatically. Columns: Registration ID, Submitted at (UTC), Team name, Team size, Member 1 to 4 name and year, Class or section (blank; retained for sheet compatibility), Team lead name/email/phone (email blank; retained for sheet compatibility), Contact consent, Submission key, Payment UTR. Teams must have two or three members; the fourth member columns remain for sheet compatibility. The team lead is Member 1. The comma-separated names field must match the individual member names. A required UTR / transaction ID is stored with each registration. Existing sheets are extended with a Payment UTR column. The submission key lets a retry after a timeout succeed without a false duplicate error.
-
-Email addresses are not collected, and registrations are no longer deduplicated by email. A retry with the same submission key returns the existing registration ID.
-
-## Deploy
-- **Vercel**: import the repo, add the four env vars in Project Settings, deploy. `api/register.js` is the function.
-- **Any Node host** (Render, Railway): build `npm run build`, start `npm start`, set the env vars as secrets.
-Rate limiting is in-memory and best-effort. Never expose the sheet publicly.
+Edit the marked block at the top of `shared/config.js`.

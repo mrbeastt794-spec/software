@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Admin: registrations</title><style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#16191d;color:#ecebe6;font:16px/1.5 system-ui,sans-serif;padding:1rem}
+main{max-width:80rem;margin:auto}h1{font-size:1.4rem;margin:.5rem 0 1rem}input,select,button,.btn{font:inherit;min-height:48px;border-radius:.6rem;border:1.5px solid #383f47;background:#22272d;color:#ecebe6;padding:0 1rem}
+button,.btn{background:#6aa6a1;color:#101315;border-color:#6aa6a1;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}button.alt{background:#22272d;color:#ecebe6;border-color:#383f47}
+:focus-visible{outline:3px solid #fff;outline-offset:2px}.bar{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}.bar input{flex:1 1 14rem}
+#login{max-width:22rem;display:grid;gap:.8rem}.err{color:#e8a9a0}.muted{color:#a5aaa6}.wrap{overflow-x:auto;border:1px solid #383f47;border-radius:.6rem}
+table{border-collapse:collapse;width:100%;min-width:72rem;font-size:.92rem}th,td{padding:.55rem .7rem;border-bottom:1px solid #2d343b;text-align:left;vertical-align:top;white-space:nowrap}th{background:#22272d;position:sticky;top:0}[hidden]{display:none!important}
+</style></head><body><main><h1>Hackathon registrations</h1>
+<form id="login"><label>Admin password<input id="pw" type="password" autocomplete="current-password" required></label><button>Sign in</button><p class="err" id="lerr" role="alert"></p></form>
+<section id="app" hidden><div class="bar"><input id="q" type="search" placeholder="Search team, name, phone, UTR, ID" aria-label="Search"><select id="year" aria-label="Filter by team lead year"><option value="">All years</option></select><button id="rf" class="alt">Refresh</button><a class="btn" id="csv" href="/api/admin/export.csv" download>Download CSV</a><button id="out" class="alt">Sign out</button></div>
+<p class="muted" id="count"></p><p class="err" id="aerr" role="alert"></p><div class="wrap"><table><thead><tr id="th"></tr></thead><tbody id="tb"></tbody></table></div></section></main>
+<script>
+const $=s=>document.querySelector(s),COLS=[['id','Registration ID'],['submitted_at','Submitted (UTC)'],['team_name','Team name'],['team_size','Size'],['lead_name','Team lead'],['lead_year','Lead year'],['team_members','Team members'],['lead_phone','Lead phone'],['utr','Payment UTR']];
+let all=[];$('#th').innerHTML=COLS.map(c=>`<th>${c[1]}</th>`).join('');
+function draw(){const q=$('#q').value.toLowerCase(),year=$('#year').value,rows=all.filter(r=>(!year||r.lead_year===year)&&JSON.stringify(Object.values(r)).toLowerCase().includes(q));
+$('#count').textContent=`${rows.length} of ${all.length} registrations`;const tb=$('#tb');tb.textContent='';
+for(const r of rows){const tr=tb.insertRow();for(const [k] of COLS){const td=tr.insertCell();td.textContent=r[k]??''}}
+$('#csv').href='/api/admin/export.csv'+(year?'?year='+encodeURIComponent(year):'')}
+async function load(){$('#aerr').textContent='';const r=await fetch('/api/admin/registrations',{credentials:'same-origin'});
+if(r.status===401||r.status===503){const j=await r.json().catch(()=>({}));$('#app').hidden=true;$('#login').hidden=false;if(r.status===503)$('#lerr').textContent=j.error;return}
+if(!r.ok){$('#aerr').textContent='Could not load registrations.';return}const data=await r.json();all=data.registrations;const selected=$('#year').value;$('#year').innerHTML='<option value="">All years</option>'+data.yearGroups.map(y=>`<option value="${y}">${y}</option>`).join('');$('#year').value=selected;$('#login').hidden=true;$('#app').hidden=false;draw()}
+$('#login').onsubmit=async e=>{e.preventDefault();$('#lerr').textContent='';const r=await fetch('/api/admin/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:$('#pw').value})});
+const j=await r.json().catch(()=>({}));if(r.ok){$('#pw').value='';load()}else $('#lerr').textContent=j.error||'Sign in failed.'};
+$('#q').oninput=draw;$('#year').onchange=draw;$('#rf').onclick=load;$('#out').onclick=async()=>{await fetch('/api/admin/logout',{method:'POST'});all=[];$('#app').hidden=true;$('#login').hidden=false};load();
+</script></body></html>
